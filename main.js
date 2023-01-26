@@ -1,51 +1,86 @@
-const Dec=document.querySelector("#task-text");
-const Submit=document.querySelector("#task-submit");
-const GetElement=document.querySelector("#getElement")
+const text=document.getElementById("task-text");
+const Submit=document.getElementById("task-submit");
+const GetElement=document.getElementById("getElement");
+
+function readLc(){
+    const hasTodo=localStorage.getItem("LcTodo");
+    const parsTodo=JSON.parse(hasTodo);
+
+    return parsTodo;
+}
 
 const Arrayform=[];
 
+const formTodo=()=>{
+const todoRE=readLc();
+if(todoRE && todoRE.length>0)
+{
+    todoRE.forEach(item => {
+        const ListElement=document.createElement("li");
+        ListElement.classList="List-Element";
+        const buttonElement=document.createElement("button");
+        buttonElement.className="button-list";
+        const textList=document.createElement("div");
+        const text=document.createElement("h1");
+        text.setAttribute("class","text-list")
+        text.innerText=item.title;
 
-const Todo=()=>{
+        const actions=document.createElement("div");
+        const DeleteBtn=document.createElement("button");
+        DeleteBtn.src="DELETE";
+        DeleteBtn.classList="Delete-Btn";
+        DeleteBtn.id=item.id;
+        DeleteBtn.addEventListener("click",(e)=>{
+            e.preventDefault();
+            const filterTodo=readLc().filter(item=>+item.id !==+e.target.id)
+            localStorage.setItem("LcTodo",JSON.stringify(filterTodo));
+            e.target.parentElement.parentElement.parentElement.remove();
+        })
 
-    Arrayform.forEach((item)=>{
+        const EditBtn=document.createElement("button");
+        EditBtn.classList="Edit-btn";
+        EditBtn.innerText="EDIT";
 
-const ListElement=document.createElement("button");
-ListElement.setAttribute("class","List-Element");
-const textList=document.createElement("div");
-const text=document.createElement("h1");
-text.innerHTML=item.decription;
-text.setAttribute("class","text-list")
-const actionlist=document.createElement("div");
-const DeleteBtn=document.createElement("button");
-DeleteBtn.innerText="DELETE";
-const EditBtn=document.createElement("button");
-EditBtn.innerText="EDIT";
-const ViewBtn=document.createElement("button");
-ViewBtn.innerText="VIEW";
+        EditBtn.addEventListener("click",(e)=>{
+            EditBtn.focus();
+            EditBtn,innerText="Save"
+        })
+        const ViewBtn=document.createElement("button");
+        ViewBtn.innerText="VIEW";
+        ViewBtn.className="View-btn";
 
-DeleteBtn.className="Delete-Btn";
-EditBtn.className="Edit-Btn";
-ViewBtn.classList="View-Btn";
+        textList.appendChild(text);
+        actions.append(DeleteBtn,EditBtn,ViewBtn);
+        buttonElement.append(textList,actions);
+        ListElement.appendChild(buttonElement);
+        GetElement.appendChild(ListElement);
 
-ListElement.append(textList,actionlist);
-textList.appendChild(text);
-actionlist.append(DeleteBtn,EditBtn,ViewBtn);
-GetElement.appendChild(ListElement);
-
-    })
+    });
 }
-Todo();
-
+}
+formTodo();
 Submit.addEventListener("click",(e)=>{
     e.preventDefault();
-
     const form={
-        decription:Dec.value
+        id:Date.now(),
+        title:text.value
     };
-    
-    Arrayform.push(form);
 
+if(readLc()&&readLc().length>0)
+{
+    const margeData=[...readLc(),form];
+const stringfyData=JSON.stringify(margeData);
+localStorage.setItem("LcTodo",stringfyData);
+}
+else{
+
+    Arrayform.push(form);
+    const stringfy=JSON.stringify(Arrayform);
+    localStorage.setItem("LcTodo",stringfy);
+}
     GetElement.innerHTML="";
-Todo();
-    Dec.value=""
+    formTodo();
+    text.value="";
+    
+    
 })
